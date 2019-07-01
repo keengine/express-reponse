@@ -1,0 +1,20 @@
+{
+  "name": "@keengine/express-reponse",
+  "version": "0.0.1",
+  "description": "Helper function for writing easy response to express response",
+  "main": "dist/index.js",
+  "keywords": [
+    "express",
+    "response"
+  ],
+  "types": "index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "rm -rf dist && tsc"
+  },
+  "author": "vkbr",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  }
+}
