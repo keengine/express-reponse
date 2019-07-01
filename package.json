@@ -1,5 +1,6 @@
 {
   "name": "@keengine/express-reponse",
+	"private": false,
   "version": "0.0.1",
   "description": "Helper function for writing easy response to express response",
   "main": "dist/index.js",
