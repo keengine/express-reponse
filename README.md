@@ -6,12 +6,12 @@ Easy response create for express.
 
 NPM:
 ```
-npm install @keengine/express-reponse
+npm install express-reponse-provider
 ```
 
 Yarn:
 ```
-yarn add @keengine/express-reponse
+yarn add express-reponse-provider
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ yarn add @keengine/express-reponse
 ```js
 // server.js
 const express = require('express');
-const ResponseProvider = require('@keengine/express-reponse');
+const ResponseProvider = require('express-reponse-provider');
 
 const app = express();
 
