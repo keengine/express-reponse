@@ -67,21 +67,22 @@ app.listen(3000, (err) => err ? console.error(err) : console.log('> Listening at
 
 ```
 
-## _Class_ ReponseProvider
+## Class _ReponseProvider_
 
-`_constructor_({ message?: string = '', statusCode?: number = 200  })`
+`constructor({ message?: string = '', statusCode?: number = 200  })`
 
 ### Properties
 
 #### static GENERIC_ERROR_MSG
 
 Message used by `genericError`.
-_Default_ "Uh! Something went wrong."
+*Default* "Uh! Something went wrong."
 
 #### static UNAUTHORIZED_MSG
 
+**Default** "Unauthorized"
+
 Message used by `errorUnauthorized`.
-_Default_ "Unauthorized"
 
 ### Methods
 
@@ -91,15 +92,15 @@ _Default_ "Unauthorized"
 
 #### setData(data): this
 
-_Alias_ `addExtra({ data })`
+**Alias** `addExtra({ data })`
 
 #### setMessage(message: string): this
 
-_Alias_ `setMessage({ message })`
+**Alias** `setMessage({ message })`
 
 #### setMeta(meta: any): this
 
-_Alias_ `setMeta({ meta })`
+**Alias** `setMeta({ meta })`
 
 #### setStatusCode(statusCode: number): this
 
@@ -107,7 +108,7 @@ Set HTTP response code for the response
 
 #### writeResponse(res: express.Response): void
 
-_Alias_ pipe, writeTo
+**Alias** _pipe_, _writeTo_
 
 Writes the set values to response using `res.json(...)` method.
 
