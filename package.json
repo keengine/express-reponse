@@ -1,6 +1,6 @@
 {
   "name": "express-reponse-provider",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helper function for writing easy response to express response",
   "main": "dist/index.js",
   "keywords": [
@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "rm -rf dist && tsc",
-		"prepublish": "yarn build"
+    "prepublish": "yarn build"
   },
   "author": "vkbr",
   "license": "MIT",
