@@ -1,4 +1,5 @@
-import { JsonValue } from './types';
+import { CookieOptions, ExpressResponse } from './types';
+
 
 class ReponseProvider {
 	static GENERIC_ERROR_MSG = 'Uh! Something went wrong.';
@@ -23,13 +24,15 @@ class ReponseProvider {
 	protected message: string;
 	protected statusCode: number;
 	protected extraPayload: any = {};
+	protected headers: any = {};
+	protected cookies: [string, string, CookieOptions?][] = [];
 
 	constructor({ message = '', statusCode = 200 }: { message?: string, statusCode?: number }) {
 		this.message = message;
 		this.statusCode = statusCode;
 	}
 
-	addExtra(extra: any) {
+	addExtra(extra: any): this {
 		this.extraPayload = {
 			...this.extraPayload,
 			...extra,
@@ -38,29 +41,52 @@ class ReponseProvider {
 		return this;
 	}
 
-	setData(data: any) {
+	setData(data: any): this {
 		this.addExtra({ data });
 		return this;
 	}
 
-	setMessage(message: string) {
+	setMessage(message: string): this {
 		this.addExtra({ message });
 		return this;
 	}
 
-	setMeta(meta: any) {
+	setMeta(meta: any): this {
 		this.addExtra({ meta });
 		return this;
 	}
 
-	setStatusCode(code) {
+	setStatusCode(code): this {
 		this.statusCode = code;
 		return this;
 	}
 
-	writeResponse(res) {
+	setHeaders(headers): this {
+		this.headers = {
+			...this.headers,
+			...headers,
+		};
+		return this;
+	}
+
+	setHeader(name: string, value: string): this {
+		return this.setHeaders({ [name]: value });
+	}
+
+	setCookie(name: string, value: string, options?: CookieOptions): this {
+		this.cookies.push([name, value, options]);
+		return this;
+	}
+
+	writeResponse(res: ExpressResponse) {
 		const statusCode = this.statusCode;
 		const isError = statusCode < 200 || statusCode > 399;
+		if (Object.keys(this.headers).length > 0) {
+			res.set(this.headers);
+		}
+		if (this.cookies.length > 0) {
+			this.cookies.forEach(([name, value, options]) => res.cookie(name, value, options));
+		}
 		res
 			.status(statusCode || 200)
 			.json({

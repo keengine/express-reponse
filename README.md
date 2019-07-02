@@ -106,6 +106,18 @@ Message used by `errorUnauthorized`.
 
 Set HTTP response code for the response
 
+#### setHeaders({[key: string]: string }): this
+
+Set multiple header
+
+#### setHeader(name: string, value: string): this
+
+Set single header
+
+#### setCookie(name: string, value: string, options: Express.CookieOptins): this
+
+Set cookie using express [`cookie`](https://expressjs.com/en/4x/api.html#res.cookie) method. Refer for list of options.
+
 #### writeResponse(res: express.Response): void
 
 **Alias** _pipe_, _writeTo_

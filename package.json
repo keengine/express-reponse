@@ -15,11 +15,13 @@
   "author": "vkbr",
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^4.17.0",
     "typescript": "^3.5.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/keengine/express-reponse"
   },
-  "homepage": "https://github.com/keengine/express-reponse"
+  "homepage": "https://github.com/keengine/express-reponse",
+  "dependencies": {}
 }
