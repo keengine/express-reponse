@@ -10,7 +10,8 @@
   "types": "index.d.ts",
   "scripts": {
     "dev": "tsc --watch",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc",
+		"prepublish": "yarn build"
   },
   "author": "vkbr",
   "license": "MIT",
