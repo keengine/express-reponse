@@ -1,6 +1,6 @@
 {
   "name": "express-reponse-provider",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Helper function for writing easy response to express response",
   "main": "dist/index.js",
   "keywords": [
