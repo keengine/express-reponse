@@ -40,12 +40,11 @@ export function withMiddleware(options: Options = {}) {
     const success: SuccessFn = (
       data,
       {
-        statusCode,
         message,
         meta,
+        statusCode = 200,
       } = {
         message: 'Success',
-        statusCode: 200,
       },
     ) => resp({
       data,
