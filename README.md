@@ -16,6 +16,86 @@ yarn add express-reponse-provider
 
 ## Usage
 
+Use any one of the patterns below. Try not to mix and match.
+
+### Middleware pattern
+
+```js
+const express = require('express');
+const { withMiddleware } = require('express-reponse-provider');
+
+const app = express();
+
+app.use(withMiddlware());
+
+app.get('/all-ok', (req, res) => {
+	res.success('Ok');
+	// responsd with 200, { "data": "Ok", "isError": false }
+});
+
+app.get('/not-ok', (req, res) => {
+	res.badInput({ message: 'This doesn\'t seem right' });
+	// responsd with 400, { "message": "This doesn't seem right", "isError": true }
+});
+
+app.get('/with-extra-info', (req, res) => {
+	res.success({ hello: 'world!', token: '<token>' }, {
+		message: 'Get hello world!',
+		meta: {
+			tokenLength: 7,
+		},
+	});
+});
+
+app.get('/with-unknown-error', (req, res) => {
+	try {
+		throw new Error('Oops');
+	} catch (e) {
+		res.error();
+		// responsd with 500, { "message": "Something went wrong!", "isError": true }
+	}
+});
+
+app.get('/with-unauthenticated-error', (req, res) => {
+	try {
+		throw new Error('Oops');
+	} catch (e) {
+		res.unauthenticated();
+		// responsd with 500, { "message": "Couldn't validate the user", "isError": true }
+	}
+});
+
+app.get('/with-unauthorised-error', (req, res) => {
+	try {
+		throw new Error('Oops');
+	} catch (e) {
+		res.unauthenticated();
+		// responsd with 500, { "message": "Insufficient permission", "isError": true }
+	}
+});
+
+app.listen(3000, (err) => err ? console.error(err) : console.log('> Listening at 3000'));
+
+```
+
+#### `withMiddleware`
+
+Definition
+
+```ts
+interface Options {
+  genericErrorMessage?: string;
+  genericUnauthenticatedMessage?: string;
+  genericUnauthorizedMessage?: string;
+  genericBadInputMessage?: string;
+}
+
+export function withMiddleware(options: Options = {}) => (res: http.IncommingMessage, res: http.OutgoingResponse, next: (err?: Error) => void);
+```
+
+
+### Using classes
+
 ```js
 // server.js
 const express = require('express');

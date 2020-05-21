@@ -1,4 +1,5 @@
 import { CookieOptions, ExpressResponse } from './types';
+import { ReponseOptions } from './middleware';
 
 
 class ReponseProvider {
