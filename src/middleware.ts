@@ -4,6 +4,7 @@ interface Options {
   genericErrorMessage?: string;
   genericUnauthenticatedMessage?: string;
   genericUnauthorizedMessage?: string;
+  genericNotFoundMessage?: string;
   genericBadInputMessage?: string;
 }
 
@@ -22,6 +23,7 @@ type ErrorResponseOptionsStrict = Exclude<ReponseOptions, 'isError' | 'data' | '
 const defaultGenericErrorMessage = 'Something went wrong!';
 const defaultGenericUnauthenticatedMessage = 'Couldn\'t validate the user';
 const defaultGenericUnauthorizedMessage = 'Insufficient permission';
+const defaultGenericNotFoundMessage = 'Not found';
 const defaultGenericBadInputMessage = 'Invalid data provided';
 
 export type SuccessFn = (data: any, options: SuccessResponseOptions) => void;
@@ -100,6 +102,18 @@ export function withMiddleware(options: Options = {}) {
       data,
       message,
       statusCode: 403,
+      isError: true,
+    });
+
+    const notFound: ErrorStrictFn = (
+      {
+        message = options.genericNotFoundMessage ?? defaultGenericNotFoundMessage,
+      }: ErrorResponseOptions = {},
+      data: any,
+    ) => resp({
+      data,
+      message,
+      statusCode: 404,
       isError: true,
     });
 

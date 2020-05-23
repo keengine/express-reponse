@@ -61,7 +61,7 @@ app.get('/with-unauthenticated-error', (req, res) => {
 		throw new Error('Oops');
 	} catch (e) {
 		res.unauthenticated();
-		// responsd with 500, { "message": "Couldn't validate the user", "isError": true }
+		// responsd with 401, { "message": "Couldn't validate the user", "isError": true }
 	}
 });
 
@@ -69,9 +69,14 @@ app.get('/with-unauthorised-error', (req, res) => {
 	try {
 		throw new Error('Oops');
 	} catch (e) {
-		res.unauthenticated();
-		// responsd with 500, { "message": "Insufficient permission", "isError": true }
+		res.unauthorized();
+		// responsd with 403, { "message": "Insufficient permission", "isError": true }
 	}
+});
+
+app.get('/with-unknown-route', (req, res) => {
+	res.notFound();
+	// responsd with 404, { "message": "Not found", "isError": true }
 });
 
 app.listen(3000, (err) => err ? console.error(err) : console.log('> Listening at 3000'));
