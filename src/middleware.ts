@@ -19,12 +19,12 @@ export interface ReponseOptions {
 }
 
 type SuccessResponseOptions = Exclude<ReponseOptions, 'isError' | 'data'>;
-type ErrorResponseOptions = Exclude<ReponseOptions, 'isError' | 'data'>;
-type ErrorResponseOptionsStrict = Exclude<ReponseOptions, 'isError' | 'data' | 'statusCode'>;
+type ErrorResponseOptions = Exclude<ReponseOptions, 'isError' | 'message'>;
+type ErrorResponseOptionsStrict = Exclude<ErrorResponseOptions, 'statusCode'>;
 
 export type SuccessFn = (data: any, options: SuccessResponseOptions) => void;
-export type ErrorFn = (data: any, options: ErrorResponseOptions) => void;
-export type ErrorStrictFn = (data: any, options: ErrorResponseOptionsStrict) => void;
+export type ErrorFn = (message?: string, options?: ErrorResponseOptions) => void;
+export type ErrorStrictFn = (message?: string, options?: ErrorResponseOptionsStrict) => void;
 
 export function withMiddleware(options: Options = {}) {
   const messageProvider = new MessageProvider(options);
@@ -41,49 +41,78 @@ export function withMiddleware(options: Options = {}) {
         message: 'Success',
       },
     ) => resposnder
-      .setData(data)
-      .setMessage(message)
-      .setMeta(meta)
-      .setStatusCode(statusCode)
-      .send(res);
+    .reset()
+    .setMessage(message)
+    .setData(data)
+    .setMeta(meta)
+    .setStatusCode(statusCode)
+    .send(res);
 
     const error: ErrorFn = (
+      message = messageProvider.genericErrorMessage,
       {
         statusCode = 500,
-        message = messageProvider.genericErrorMessage,
+        data,
+        meta,
       } = {},
-      data?: any,
-    ) => new ResponseProvider(res)
+    ) => resposnder
+    .reset()
     .setData(data)
-    .error(message, statusCode);
+    .setMeta(meta)
+    .error(message, statusCode)
+    .send(res);
 
     const badInput: ErrorStrictFn = (
       message = messageProvider.genericBadInputMessage,
-      data?: any,
-    ) => new ResponseProvider(res)
-      .setData(data)
-      .badInput(message);
+      {
+        data,
+        meta,
+      } = {},
+    ) => resposnder
+    .reset()
+    .setData(data)
+    .setMeta(meta)
+    .badInput(message)
+    .send(res);
 
     const unauthenticated: ErrorStrictFn = (
       message = messageProvider.genericUnauthenticatedMessage,
-      data?: any,
-    ) => new ResponseProvider(res)
-      .setData(data)
-      .unauthenticated(message);
+      {
+        data,
+        meta,
+      } = {},
+    ) => resposnder
+    .reset()
+    .setData(data)
+    .setMeta(meta)
+    .unauthenticated(message)
+    .send(res);
 
     const unauthorized: ErrorStrictFn = (
       message = messageProvider.genericUnauthorizedMessage,
-      data?: any,
-    ) => new ResponseProvider(res)
-      .setData(data)
-      .unauthorized(message);
+      {
+        data,
+        meta,
+      } = {}
+    ) => resposnder
+    .reset()
+    .setData(data)
+    .setMeta(meta)
+    .unauthorized(message)
+    .send(res);
 
     const notFound: ErrorStrictFn = (
       message = messageProvider.genericNotFoundMessage,
-      data?: any,
-    ) => new ResponseProvider(res)
+      {
+        data,
+        meta,
+      } = {}
+    ) => resposnder
+    .reset()
     .setData(data)
-    .notFound(message);
+    .setMeta(meta)
+    .notFound(message)
+    .send(res);
 
     res.success = success;
     res.error = error;

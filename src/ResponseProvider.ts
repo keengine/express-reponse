@@ -28,6 +28,16 @@ class ReponseProvider {
 		}
 	}
 
+	reset() {
+		this.message = '';
+		this.statusCode = 200;
+		this.isError = undefined;
+		this.payload = {};
+		this.headers = {};
+		this.cookies = [];
+		return this;
+	}
+
 	private addExtra(extra: any): this {
 		this.payload = {
 			...this.payload,
