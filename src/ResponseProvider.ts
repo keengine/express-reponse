@@ -1,41 +1,36 @@
 import { CookieOptions, ExpressResponse } from './types';
-import { ReponseOptions } from './middleware';
+import { MessageProvider } from './MessageProvider';
 
 
 class ReponseProvider {
 	static GENERIC_ERROR_MSG = 'Uh! Something went wrong.';
 	static UNAUTHORIZED_MSG = 'Unauthorized';
 
-	static success(message) {
-		return new ReponseProvider({ message });
-	};
-
-	static error(message, statusCode = 500) {
-		return new ReponseProvider({ message, statusCode });
-	};
-
-	static genericError() {
-		return ReponseProvider.error(ReponseProvider.GENERIC_ERROR_MSG);
-	}
-
-	static errorUnauthorized() {
-		return ReponseProvider.error(ReponseProvider.UNAUTHORIZED_MSG, 401);
-	}
-
 	protected message: string;
 	protected statusCode: number;
-	protected extraPayload: any = {};
+	protected isError: boolean;
+	protected payload: any = {};
 	protected headers: any = {};
 	protected cookies: [string, string, CookieOptions?][] = [];
+	private res: ExpressResponse;
 
-	constructor({ message = '', statusCode = 200 }: { message?: string, statusCode?: number }) {
-		this.message = message;
-		this.statusCode = statusCode;
+	constructor(res?: ExpressResponse, options: { autoSendOnNextTick?: boolean } = {}) {
+		if (!(this instanceof ReponseProvider)) {
+			return new ReponseProvider(res);
+		}
+
+		this.res = res;
+
+		const { autoSendOnNextTick = true } = options;
+
+		if (res && autoSendOnNextTick) {
+			process.nextTick(() => this.send());
+		}
 	}
 
-	addExtra(extra: any): this {
-		this.extraPayload = {
-			...this.extraPayload,
+	private addExtra(extra: any): this {
+		this.payload = {
+			...this.payload,
 			...extra,
 		};
 
@@ -43,18 +38,15 @@ class ReponseProvider {
 	}
 
 	setData(data: any): this {
-		this.addExtra({ data });
-		return this;
+		return this.addExtra({ data });
 	}
 
 	setMessage(message: string): this {
-		this.addExtra({ message });
-		return this;
+		return this.addExtra({ message });
 	}
 
 	setMeta(meta: any): this {
-		this.addExtra({ meta });
-		return this;
+		return this.addExtra({ meta });
 	}
 
 	setStatusCode(code): this {
@@ -79,9 +71,18 @@ class ReponseProvider {
 		return this;
 	}
 
-	writeResponse(res: ExpressResponse) {
+	setIsError(isError: boolean): this {
+		this.isError = isError;
+		return this;
+	}
+
+	markError(): this {
+		return this.setIsError(true);
+	}
+
+	send(res: ExpressResponse = this.res) {
 		const statusCode = this.statusCode;
-		const isError = statusCode < 200 || statusCode > 399;
+		const isError = this.isError === undefined ? statusCode < 200 || statusCode > 399 : this.isError;
 		if (Object.keys(this.headers).length > 0) {
 			res.set(this.headers);
 		}
@@ -93,12 +94,30 @@ class ReponseProvider {
 			.json({
 				message: this.message || undefined,
 				isError,
-				...this.extraPayload,
+				...this.payload,
 			});
 	}
 
-	pipe = this.writeResponse;
-	writeTo = this.writeResponse;
+	pipe = this.send;
+	writeTo = this.send;
+
+	public success = this.setMessage;
+	public error(message: string = MessageProvider.defaultGenericErrorMessage, statusCode = 500) {
+		return this.setMessage(message).setStatusCode(statusCode);
+	}
+	public unauthenticated(message: string = MessageProvider.defaultGenericUnauthenticatedMessage) {
+		return this.setMessage(message).setStatusCode(401);
+	}
+	public unauthorized(message: string = MessageProvider.defaultGenericUnauthorizedMessage) {
+		return this.setMessage(message).setStatusCode(403);
+	}
+	public badInput(message: string = MessageProvider.defaultGenericBadInputMessage) {
+		return this.setMessage(message).setStatusCode(400);
+	}
+	public notFound(message: string = MessageProvider.defaultGenericNotFoundMessage) {
+		return this.setMessage(message).setStatusCode(404);
+	}
 }
 
 export default ReponseProvider;
+

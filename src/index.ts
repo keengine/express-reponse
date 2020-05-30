@@ -1,6 +1,4 @@
-import ResponseProvider from './ResponseProvider';
-
-export default ResponseProvider;
+export { default } from './ResponseProvider';
 
 export { withMiddleware } from './middleware';
 

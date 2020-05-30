@@ -1,4 +1,6 @@
 import ResponseProvider from '.';
+import ReponseProvider from './ResponseProvider';
+import { MessageProvider } from './MessageProvider';
 
 interface Options {
   genericErrorMessage?: string;
@@ -20,25 +22,15 @@ type SuccessResponseOptions = Exclude<ReponseOptions, 'isError' | 'data'>;
 type ErrorResponseOptions = Exclude<ReponseOptions, 'isError' | 'data'>;
 type ErrorResponseOptionsStrict = Exclude<ReponseOptions, 'isError' | 'data' | 'statusCode'>;
 
-const defaultGenericErrorMessage = 'Something went wrong!';
-const defaultGenericUnauthenticatedMessage = 'Couldn\'t validate the user';
-const defaultGenericUnauthorizedMessage = 'Insufficient permission';
-const defaultGenericNotFoundMessage = 'Not found';
-const defaultGenericBadInputMessage = 'Invalid data provided';
-
 export type SuccessFn = (data: any, options: SuccessResponseOptions) => void;
 export type ErrorFn = (data: any, options: ErrorResponseOptions) => void;
 export type ErrorStrictFn = (data: any, options: ErrorResponseOptionsStrict) => void;
 
 export function withMiddleware(options: Options = {}) {
-  return (req, res, next) => {
-    const resp = ({ data, isError, statusCode, message, meta }: ReponseOptions = {}) => res.status(statusCode).json({
-      data,
-      meta,
-      message,
-      isError,
-    });
+  const messageProvider = new MessageProvider(options);
+  const resposnder = new ReponseProvider();
 
+  return (req, res, next) => {
     const success: SuccessFn = (
       data,
       {
@@ -48,80 +40,57 @@ export function withMiddleware(options: Options = {}) {
       } = {
         message: 'Success',
       },
-    ) => resp({
-      data,
-      message,
-      meta,
-      statusCode,
-      isError: false,
-    });
+    ) => resposnder
+      .setData(data)
+      .setMessage(message)
+      .setMeta(meta)
+      .setStatusCode(statusCode)
+      .send(res);
 
     const error: ErrorFn = (
       {
         statusCode = 500,
-        message = options.genericErrorMessage ?? defaultGenericErrorMessage,
+        message = messageProvider.genericErrorMessage,
       } = {},
-      data: any,
-    ) => resp({
-      data,
-      message,
-      statusCode,
-      isError: true,
-    });
+      data?: any,
+    ) => new ResponseProvider(res)
+    .setData(data)
+    .error(message, statusCode);
 
     const badInput: ErrorStrictFn = (
-      {
-        message = options.genericBadInputMessage ?? defaultGenericBadInputMessage,
-      } = {},
-      data: any,
-    ) => resp({
-      data,
-      message,
-      statusCode: 400,
-      isError: true,
-    });
+      message = messageProvider.genericBadInputMessage,
+      data?: any,
+    ) => new ResponseProvider(res)
+      .setData(data)
+      .badInput(message);
 
     const unauthenticated: ErrorStrictFn = (
-      {
-        message = options.genericUnauthenticatedMessage ?? defaultGenericUnauthenticatedMessage,
-      } = {},
-      data: any,
-    ) => resp({
-      data,
-      message,
-      statusCode: 401,
-      isError: true,
-    });
+      message = messageProvider.genericUnauthenticatedMessage,
+      data?: any,
+    ) => new ResponseProvider(res)
+      .setData(data)
+      .unauthenticated(message);
 
     const unauthorized: ErrorStrictFn = (
-      {
-        message = options.genericUnauthorizedMessage ?? defaultGenericUnauthorizedMessage,
-      }: ErrorResponseOptions = {},
-      data: any,
-    ) => resp({
-      data,
-      message,
-      statusCode: 403,
-      isError: true,
-    });
+      message = messageProvider.genericUnauthorizedMessage,
+      data?: any,
+    ) => new ResponseProvider(res)
+      .setData(data)
+      .unauthorized(message);
 
     const notFound: ErrorStrictFn = (
-      {
-        message = options.genericNotFoundMessage ?? defaultGenericNotFoundMessage,
-      }: ErrorResponseOptions = {},
-      data: any,
-    ) => resp({
-      data,
-      message,
-      statusCode: 404,
-      isError: true,
-    });
+      message = messageProvider.genericNotFoundMessage,
+      data?: any,
+    ) => new ResponseProvider(res)
+    .setData(data)
+    .notFound(message);
 
     res.success = success;
     res.error = error;
     res.badInput = badInput;
     res.unauthenticated = unauthenticated;
     res.unauthorized = unauthorized;
+    res.notFound = notFound;
 
     next();
   };
