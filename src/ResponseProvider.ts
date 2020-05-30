@@ -80,7 +80,14 @@ class ReponseProvider {
 		return this.setIsError(true);
 	}
 
-	send(res: ExpressResponse = this.res) {
+	send(res?: ExpressResponse) {
+		process.nextTick(() => {
+			this.sendNextTick(res);
+		});
+		return this;
+	}
+
+	private sendNextTick(res: ExpressResponse = this.res) {
 		const statusCode = this.statusCode;
 		const isError = this.isError === undefined ? statusCode < 200 || statusCode > 399 : this.isError;
 		if (Object.keys(this.headers).length > 0) {
