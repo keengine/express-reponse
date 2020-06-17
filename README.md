@@ -1,4 +1,4 @@
-# Clean Redux Reducer
+# Express response
 
 Easy response create for express.
 
