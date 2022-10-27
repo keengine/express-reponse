@@ -27,7 +27,7 @@ require('express-reponse-provider');
 const app = express();
 
 app.get('/all-ok', (req, res) => {
-  req.sendSuccess('ok'); // responsd with 200, { "message": "Ok", "isError": false }
+  req.sendSuccess({ foo: 'bar' }); // responsd with 200, { "data":{"foo":"bar"}, "isError": false }
 });
 
 app.get('/not-ok', (req, res) => {
@@ -76,4 +76,4 @@ app.listen(3000, (err) =>
 
 ## API Reference
 
-[`ReponseProvider`](./dist/ResponseProvider.d.ts)
+[`ReponseProvider`](https://github.com/keengine/express-reponse/blob/master/%40types/express.d.ts)
