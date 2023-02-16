@@ -62,5 +62,6 @@ export type SendNotFound = typeof sendNotFound;
 export type SendTemporaryRedirect = typeof sendTemporaryRedirect;
 export type SendPermamentRedirect = typeof sendPermamentRedirect;
 
-export * from '../@types/express.d';
+// hack to include the exported type extension. without it types are not available.
+export { Ty } from '../@types/express.d';
 export { ReponseProvider } from './ResponseProvider';
